@@ -1,0 +1,60 @@
+/* Centsible App - Global Color Variables */
+
+:root {
+    /* Primary Colors */
+    --primary-main: #2E7D32;      /* Dark green - represents money/growth */
+    --primary-light: #4CAF50;     /* Lighter green for hover states */
+    --primary-dark: #1B5E20;      /* Darker green for active states */
+    
+    /* Secondary Colors */
+    --secondary-main: #1976D2;    /* Blue - represents trust/stability */
+    --secondary-light: #42A5F5;   /* Lighter blue for hover states */
+    --secondary-dark: #0D47A1;    /* Darker blue for active states */
+  
+    /* Neutral Colors */
+    --neutral-100: #FFFFFF;       /* White */
+    --neutral-200: #F5F5F5;       /* Off-white for backgrounds */
+    --neutral-300: #E0E0E0;       /* Light grey for borders */
+    --neutral-400: #BDBDBD;       /* Medium grey for disabled elements */
+    --neutral-500: #9E9E9E;       /* Medium-dark grey for secondary text */
+    --neutral-600: #757575;       /* Dark grey for primary text */
+    --neutral-700: #616161;       /* Darker grey */
+    --neutral-800: #424242;       /* Very dark grey */
+    --neutral-900: #212121;       /* Almost black */
+  
+    /* Status Colors */
+    --success: #66BB6A;           /* Green for positive numbers/successful actions */
+    --warning: #FFA726;           /* Orange for warnings/alerts */
+    --danger: #EF5350;            /* Red for negative numbers/errors */
+    --info: #29B6F6;              /* Light blue for information/tips */
+  
+    /* Budget Category Colors (for charts and visualizations) */
+    --category-1: #8E24AA;        /* Purple */
+    --category-2: #D81B60;        /* Pink */
+    --category-3: #FB8C00;        /* Orange */
+    --category-4: #FFD600;        /* Yellow */
+    --category-5: #00ACC1;        /* Teal */
+    --category-6: #43A047;        /* Green */
+    --category-7: #5E35B1;        /* Deep Purple */
+    --category-8: #1E88E5;        /* Blue */
+  
+    /* Shadows */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* You can also add global typography settings here */
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    color: var(--neutral-800);
+    background-color: var(--neutral-200);
+  }
+  
+  /* Add responsive breakpoints */
+  :root {
+    --breakpoint-sm: 576px;
+    --breakpoint-md: 768px;
+    --breakpoint-lg: 992px;
+    --breakpoint-xl: 1200px;
+  }

@@ -1,1 +1,3 @@
 client/.env
+client/firebase.ts
+client/src/firebase.ts
