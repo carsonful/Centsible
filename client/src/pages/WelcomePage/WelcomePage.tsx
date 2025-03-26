@@ -1,127 +1,179 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import './WelcomePage.css';
+import money from '../../assets/Hands - Cash.png';
+import { SignOutButton, SignedIn, SignedOut, SignInButton, SignUpButton } from '@clerk/clerk-react';
 
 const WelcomePage: React.FC = () => {
-  const [isScrolled, setIsScrolled] = useState(false);
-  
-  useEffect(() => {
-    const handleScroll = () => {
-      const heroSection = document.getElementById('hero');
-      if (heroSection) {
-        const heroHeight = heroSection.offsetHeight;
-        setIsScrolled(window.scrollY > heroHeight - 100);
-      }
-    };
-    
-    window.addEventListener('scroll', handleScroll);
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
-  }, []);
-  
   return (
     <div className="welcome-container">
-      <header className={`site-header ${isScrolled ? 'hidden' : ''}`}>
-        <div className="logo">CENTSIBLE</div>
-        <nav className="main-nav">
+      {/* Header */}
+      <header className="header">
+        <div className="logo-container">
+          <div className="logo-placeholder"></div>
+          <span className="logo-text">centsible</span>
+        </div>
+        <nav className="nav-menu">
           <ul>
-            <li><a href="#">Features</a></li>
-            <li><a href="#">About Us</a></li>
-            <li><a href="#">Blog</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#features">Features</a></li>
+            <li><a href="#use-cases">Use Cases</a></li>
+            <li><a href="#blog">Blog</a></li>
           </ul>
         </nav>
-        <div className="auth-buttons">
-          <button className="btn-login">Sign In</button>
-        </div>
+
+
+        {/* If user is signed in show this */}
+        <SignedIn>
+          <SignOutButton>
+            <button className="cta-button-small">Sign out</button>
+          </SignOutButton>
+        </SignedIn>
+
+        {/* If user is signed out show this */}
+        <SignedOut>
+          <SignInButton mode="modal">
+            <button className="cta-button-small">Sign in</button>
+          </SignInButton>
+        </SignedOut>
       </header>
 
-      <section className="hero-section" id="hero">
-        <div className="overlay"></div>
+      {/* Hero Section */}
+      <section className="hero-section">
         <div className="hero-content">
-          <div className="tag-line">YOUR FINANCIAL COMPANION</div>
-          <h1>Take Control Of Your<br />Money Today!</h1>
-          <div className="hero-buttons">
-            <button className="btn-cta-primary">Get Started</button>
-            <button className="btn-cta-secondary">Learn More</button>
-          </div>
-          <button className="scroll-down" onClick={() => document.getElementById('section-01')?.scrollIntoView({ behavior: 'smooth' })}>
-            Scroll down
-            <span className="arrow">↓</span>
-          </button>
+          <h1>Smart finance for <span className="highlight">your future</span></h1>
+          <p>
+            Simple tools to help you manage your money efficiently,
+            track expenses, set goals, and make smarter financial decisions.
+          </p>
+          <SignedOut>
+            <SignUpButton mode="modal">
+              <button className="cta-button">Get started</button>
+            </SignUpButton>
+          </SignedOut>
+          <SignedIn>
+            <a href="/dashboard" className="cta-button">Dashboard </a>
+          </SignedIn>
+        </div>
+        <div className="hero-image">
+          <img src={money} alt="Hands holding cash" />
         </div>
       </section>
 
-      <section className="content-section" id="section-01">
-        <div className="section-container">
-          <div className="section-number">01</div>
-          <div className="section-header">
-            <div className="section-tag">GET STARTED</div>
-            <h2>Track Every Dollar<br />With Ease</h2>
+      {/* Features Section */}
+      <section className="features-section" id="features">
+        <div className="section-title">
+          <span className="tag">Features</span>
+          <h2>Smart tools for your finances</h2>
+        </div>
+
+        <div className="features-grid">
+          <div className="feature-card">
+            <div className="feature-number">01</div>
+            <h3>Expense Tracking</h3>
+            <p>Automatically categorize and visualize your spending patterns</p>
           </div>
-          <div className="section-content">
-            <p className="section-text">
-              Centsible makes it simple to monitor all your transactions in one place.
-              Our intuitive interface automatically categorizes your spending, making
-              budget tracking effortless. Connect your accounts and start seeing where
-              your money goes immediately, with real-time updates and notifications.
-            </p>
-            <a href="#" className="read-more">read more <span className="arrow">→</span></a>
+
+          <div className="feature-card">
+            <div className="feature-number">02</div>
+            <h3>Budget Planning</h3>
+            <p>Create custom budgets that adapt to your lifestyle and goals</p>
           </div>
-          <div className="section-image">
-            <div className="image-placeholder">Image of person budgeting</div>
+
+          <div className="feature-card">
+            <div className="feature-number">03</div>
+            <h3>Savings Goals</h3>
+            <p>Set, track, and achieve your financial milestones</p>
+          </div>
+
+          <div className="feature-card">
+            <div className="feature-number">04</div>
+            <h3>Visual Analytics</h3>
+            <p>Gain insights through intuitive charts and reports</p>
+          </div>
+        </div>
+      </section>
+      
+      {/* Chart Demo Section */}
+      <section className="chart-section">
+        <div className="section-title">
+          <span className="tag">Analytics</span>
+          <h2>Visualize your spending habits</h2>
+          <p>Gain insights through intuitive and clear financial charts</p>
+        </div>
+        
+
+        <div className='placeholder-text'>Chart Coming Soon</div>
+      </section>
+
+      {/* App Preview Section */}
+      <section className="app-preview-section">
+        <div className="section-title">
+          <span className="tag">App Preview</span>
+          <h2>See what you're getting</h2>
+          <p>A clean, intuitive interface that makes finance management simple</p>
+        </div>
+        
+        <div className="preview-container">
+          <div className="preview-placeholder">
+            <div className="placeholder-text">App Screenshot Coming Soon</div>
           </div>
         </div>
       </section>
 
-      <section className="content-section alt-section">
-        <div className="section-container">
-          <div className="section-image">
-            <div className="image-placeholder">Image of budget dashboard</div>
+      {/* How It Works Section */}
+      <section className="how-it-works-section" id="how-it-works">
+        <div className="section-title">
+          <span className="tag">Process</span>
+          <h2>How Centsible works</h2>
+          <p>Getting started is easy and only takes a few minutes</p>
+        </div>
+        
+        <div className="steps-container">
+          <div className="step">
+            <div className="step-number">1</div>
+            <h3>Connect your accounts</h3>
+            <p>Securely link your bank accounts to automatically import your financial data</p>
           </div>
-          <div className="section-number">02</div>
-          <div className="section-header">
-            <div className="section-tag">POWERFUL FEATURES</div>
-            <h2>Visualize Your<br />Spending Habits</h2>
+          <div className="step-connector"></div>
+          <div className="step">
+            <div className="step-number">2</div>
+            <h3>Categorize expenses</h3>
+            <p>We'll automatically sort your transactions into categories you can customize</p>
           </div>
-          <div className="section-content">
-            <p className="section-text">
-              Transform complex financial data into clear, actionable insights. 
-              Centsible's beautiful charts and reports help you understand exactly 
-              where your money is going. Identify spending patterns, spot savings 
-              opportunities, and track your progress toward financial goals with 
-              our interactive dashboards.
-            </p>
-            <a href="#" className="read-more">read more <span className="arrow">→</span></a>
+          <div className="step-connector"></div>
+          <div className="step">
+            <div className="step-number">3</div>
+            <h3>Set your budget</h3>
+            <p>Create budget goals based on your spending history and financial objectives</p>
+          </div>
+          <div className="step-connector"></div>
+          <div className="step">
+            <div className="step-number">4</div>
+            <h3>Track and optimize</h3>
+            <p>Get insights and recommendations to improve your financial habits</p>
           </div>
         </div>
       </section>
 
-      <section className="content-section">
-        <div className="section-container">
-          <div className="section-number">03</div>
-          <div className="section-header">
-            <div className="section-tag">SMART BUDGETING</div>
-            <h2>Set Goals &<br />Achieve Them</h2>
-          </div>
-          <div className="section-content">
-            <p className="section-text">
-              Create custom savings goals and watch your progress in real-time. 
-              Whether you're saving for a vacation, a new home, or building an emergency fund, 
-              Centsible helps you stay on track. Set up automatic savings rules, get 
-              personalized recommendations, and celebrate your milestones along the way.
-            </p>
-            <a href="#" className="read-more">read more <span className="arrow">→</span></a>
-          </div>
-          <div className="section-image">
-            <div className="image-placeholder">Image of financial graphs</div>
-          </div>
+      {/* CTA Section */}
+      <section className="cta-section">
+        <div className="cta-content">
+          <h2>Ready to optimize your finances?</h2>
+          <p>
+            Start your journey to financial freedom today.
+          </p>
+          <SignedOut>
+            <a href="#proposal" className="cta-button">Get started</a>
+          </SignedOut>
+          <SignedIn>
+            <a href="/dashboard" className="cta-button">Dashboard</a>
+          </SignedIn>
         </div>
       </section>
 
-      <footer className="site-footer">
-        <div className="simple-footer">
-          <p>Made with love by Carson Fulmer</p>
-        </div>
+      {/* Footer */}
+      <footer className="footer">
+        <p>Made with ♥ by Carson Fulmer</p>
       </footer>
     </div>
   );
