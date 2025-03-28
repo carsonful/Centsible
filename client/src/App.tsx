@@ -1,55 +1,40 @@
 // src/App.tsx
-import { Routes, Route, Navigate } from 'react-router-dom';
-import { SignIn, SignUp, UserProfile, SignedIn, SignedOut } from '@clerk/clerk-react';
+import { ClerkProvider, SignedIn, SignedOut } from '@clerk/clerk-react';
 import WelcomePage from './pages/WelcomePage/WelcomePage';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Dashboard from './pages/Dashboard/Dashboard';
+import './pages/WelcomePage/WelcomePage.css';
+
+const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
 function App() {
   return (
-    <Routes>
-      {/* Public routes */}
-      <Route path="/" element={<WelcomePage />} />
-      
-      {/* Clerk authentication routes */}
-      <Route path="/sign-in/*" element={
-        <SignedOut>
-          <SignIn routing="path" path="/sign-in" />
-        </SignedOut>
-      } />
-      
-      <Route path="/sign-up/*" element={
-        <SignedOut>
-          <SignUp routing="path" path="/sign-up" />
-        </SignedOut>
-      } />
-      
-      {/* Protected routes */}
-      <Route path="/dashboard" element={
-        <>
-          <SignedIn>
-            <AuthLayout>
-              <Dashboard />
-            </AuthLayout>
-          </SignedIn>
-          <SignedOut>
-            <Navigate to="/sign-in" replace />
-          </SignedOut>
-        </>
-      } />
-      
-      <Route path="/profile" element={
-        <>
-          <SignedIn>
-            <AuthLayout>
-              <UserProfile />
-            </AuthLayout>
-          </SignedIn>
-          <SignedOut>
-            <Navigate to="/sign-in" replace />
-          </SignedOut>
-        </>
-      } />
-    </Routes>
+    <ClerkProvider publishableKey={clerkPubKey}>
+      <BrowserRouter>
+        <Routes>
+          {/* Unprotected Routes */}
+          <Route path="/" element={<WelcomePage />} />
+          
+          {/* For Future */}
+          {/* <Route path="/aboutUs" element={<AboutUs />} /> */}
+          
+          {/* Protected Routes */}
+          <Route 
+            path="/dashboard" 
+            element={
+              <>
+                <SignedIn>
+                  <Dashboard />
+                </SignedIn>
+                <SignedOut>
+                  <WelcomePage />
+                </SignedOut>
+              </>
+            }
+          />
+        </Routes>
+      </BrowserRouter>
+    </ClerkProvider>
   );
 }
 
