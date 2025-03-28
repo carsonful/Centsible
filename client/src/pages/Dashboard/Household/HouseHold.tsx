@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import './HouseHold.css';
 import { createHouseHold, getUserHousehold, getHouseholdTransactions } from '../../../firebase/firebase'; // Adjust path as needed
-import { usertype, householdType } from '../../../types/types';
+import { usertype, householdType, transactionType } from '../../../types/types';
 import { useUser } from '@clerk/clerk-react';
+import AddHouseholdTransaction from '../../../components/AddHouseholdTransaction';
+
 
 const Household: React.FC = () => {
   const { user } = useUser();
@@ -10,9 +12,9 @@ const Household: React.FC = () => {
   const [householdName, setHouseholdName] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [household, setHousehold] = useState<any>(null);
+  const [household, setHousehold] = useState<householdType>();
   const [isLoadingHousehold, setIsLoadingHousehold] = useState(true);
-  const [transactions, setTransactions] = useState<any[]>([]);
+  const [transactions, setTransactions] = useState<transactionType[]>([]);
   
   // Current user info
   const currentUser: usertype = {
@@ -36,6 +38,7 @@ const Household: React.FC = () => {
         // If user has a household, fetch its transactions
         if (userHousehold) {
           const householdTransactions = await getHouseholdTransactions(userHousehold.id);
+          console.log("Household transactions:", householdTransactions);
           setTransactions(householdTransactions);
         }
       } catch (error) {
@@ -173,27 +176,28 @@ const Household: React.FC = () => {
           {/* Display transactions if available */}
           <div className="card">
             <div className="card-header">
-              <h2>Recent Transactions</h2>
-              <button className="button">Add Transaction</button>
+                <h2>Recent Transactions</h2>
+                {household && <AddHouseholdTransaction householdId={household.id} userId={user?.id} />}
             </div>
             <div className="card-content">
               {transactions.length === 0 ? (
                 <p>No transactions yet. Add your first expense!</p>
               ) : (
                 <ul className="transactions-list">
-                  {transactions.map(transaction => (
+                {transactions.map(transaction => (
                     <li key={transaction.id} className="transaction-item">
-                      <div className="transaction-details">
+                    <div className="transaction-details">
                         <div className="transaction-name">{transaction.name}</div>
+                        <div className="transaction-category">{transaction.userfullname}</div>
                         <div className="transaction-date">
-                          {transaction.date?.toLocaleDateString()}
+                        {transaction.date instanceof Date ? transaction.date.toLocaleDateString() : 'No date'}
                         </div>
-                      </div>
-                      <div className="transaction-amount">
-                        ${transaction.amount?.toFixed(2)}
-                      </div>
+                    </div>
+                    <div className="transaction-amount">
+                        ${parseFloat(transaction.amount).toFixed(2)}
+                    </div>
                     </li>
-                  ))}
+                ))}
                 </ul>
               )}
             </div>

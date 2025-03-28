@@ -19,6 +19,7 @@ interface transactionType {
     category?: string;
     date?: Date;
     notes?: string;
+    userfullname?: string;
 } export type { transactionType };
 
 
