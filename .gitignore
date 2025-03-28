@@ -3,3 +3,4 @@ client/firebase.ts
 client/src/firebase.ts
 node_modules
 client/src/firebase/firebase.js
+client/src/firebase/firebase.ts

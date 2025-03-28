@@ -1,7 +1,8 @@
 import React from 'react';
 import './Dashboard.css';
-import { UserButton } from '@clerk/clerk-react';
-
+import { UserButton, useUser } from '@clerk/clerk-react';
+import { syncUserToFirestore } from '../../firebase/firebase';
+import {usertype} from '../../types/types';
 // Mock data for testing
 const summaryData = [
   { title: 'Total Balance', value: '$15,781.90', trend: '+5.25%', positive: true },
@@ -10,7 +11,30 @@ const summaryData = [
   { title: 'Savings Rate', value: '36%', trend: 'On track to goal', positive: true },
 ];
 
+
+
 const Dashboard: React.FC = () => {
+
+
+  const { user, isLoaded } = useUser();
+  
+  const currUser : usertype = {
+    id: user?.id,
+    firstName: user?.firstName,
+    lastName: user?.lastName,
+    emailAddress: user?.emailAddresses[0].emailAddress,
+    imageUrl: user?.imageUrl,
+    createdAt: user?.createdAt
+  }
+
+  if(!isLoaded) {
+    return <div>Loading...</div>;
+  } else { 
+    syncUserToFirestore(currUser);
+  }
+
+
+
   return (
     <div className="dashboard-container">
       <header className="dashboard-header">
@@ -51,7 +75,6 @@ const Dashboard: React.FC = () => {
           <div className="card-content">
             {/* Chart placeholder - we'll add a real chart here later */}
             <div className="chart-container">
-              Chart will be added here
             </div>
           </div>
         </div>
