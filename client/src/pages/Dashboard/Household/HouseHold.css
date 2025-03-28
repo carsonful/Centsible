@@ -1,0 +1,171 @@
+/* Household.css */
+.household-container {
+    width: 100%;
+  }
+  
+  /* You can leverage existing styles from Dashboard.css for cards and other elements *//* Add to Household.css */
+.invitations-card {
+    margin-bottom: 24px;
+  }
+  
+  .invitations-list {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .invitation-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 0;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  
+  .invitation-item:last-child {
+    border-bottom: none;
+  }
+  
+  .invitation-details {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .invitation-title {
+    font-size: 16px;
+    margin-bottom: 4px;
+  }
+  
+  .invitation-info {
+    font-size: 14px;
+    color: #757575;
+  }
+  
+  .invitation-actions {
+    display: flex;
+    gap: 12px;
+  }
+
+
+  /* Household.css */
+.household-container {
+    width: 100%;
+  }
+  
+  .form-group {
+    margin-bottom: 20px;
+  }
+  
+  .form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+  }
+  
+  .form-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    font-size: 14px;
+  }
+  
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+  }
+  
+  .error-message {
+    color: #f44336;
+    margin-top: 10px;
+    font-size: 14px;
+  }
+
+  /* Household.css */
+.household-container {
+    width: 100%;
+  }
+  
+  .form-group {
+    margin-bottom: 20px;
+  }
+  
+  .form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+  }
+  
+  .form-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    font-size: 14px;
+  }
+  
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+  }
+  
+  .error-message {
+    color: #f44336;
+    margin-top: 10px;
+    font-size: 14px;
+  }
+  
+  .loading-text {
+    text-align: center;
+    padding: 20px;
+    color: #757575;
+  }
+  
+  .household-details h3 {
+    font-size: 18px;
+    margin-bottom: 8px;
+  }
+  
+  .household-role {
+    color: #757575;
+    font-size: 14px;
+  }
+  
+  .transactions-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .transaction-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  
+  .transaction-item:last-child {
+    border-bottom: none;
+  }
+  
+  .transaction-details {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .transaction-name {
+    font-weight: 500;
+  }
+  
+  .transaction-date {
+    font-size: 14px;
+    color: #757575;
+  }
+  
+  .transaction-amount {
+    font-weight: 500;
+  }

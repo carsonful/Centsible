@@ -19,4 +19,16 @@ interface transactionType {
     category?: string;
     date?: Date;
     notes?: string;
+    userfullname?: string;
 } export type { transactionType };
+
+
+
+// If not already in your types.ts, add:
+
+interface householdType {
+    id?: string;
+    name: string;
+    ownerId: string;
+    createdAt?: Date;
+} export type { householdType };
