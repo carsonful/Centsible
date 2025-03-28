@@ -2,7 +2,8 @@ import React from 'react';
 import './Dashboard.css';
 import { UserButton, useUser } from '@clerk/clerk-react';
 import { syncUserToFirestore } from '../../firebase/firebase';
-import {usertype} from '../../types/types';
+import {usertype } from '../../types/types';
+import AddTransactionButton from '../../components/AddTransaction';
 // Mock data for testing
 const summaryData = [
   { title: 'Total Balance', value: '$15,781.90', trend: '+5.25%', positive: true },
@@ -33,6 +34,8 @@ const Dashboard: React.FC = () => {
     syncUserToFirestore(currUser);
   }
 
+
+  
 
 
   return (
@@ -84,6 +87,9 @@ const Dashboard: React.FC = () => {
           <div className="card-header">
             <h2>Recent Transactions</h2>
             <button className="button button-secondary">View All</button>
+          </div>
+          <div>
+            <AddTransactionButton userId={currUser.id} />
           </div>
           <div className="card-content">
             <p>Transaction data will be displayed here.</p>
