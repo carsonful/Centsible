@@ -483,7 +483,23 @@ const Household: React.FC = () => {
                     <AddHouseholdTransaction 
                       householdId={household.id} 
                       userId={user?.id} 
-                      onTransactionAdded={refreshData}
+                      onTransactionAdded={() => {
+                        // Use a more controlled approach to refresh data
+                        const fetchTransactions = async () => {
+                          try {
+                            if (household?.id) {
+                              const householdTransactions = await getHouseholdTransactions(household.id);
+                              setTransactions(householdTransactions);
+                            }
+                          } catch (error) {
+                            console.error("Error fetching transactions:", error);
+                          }
+                        };
+                        
+                        fetchTransactions();
+                        // Don't increment refreshTrigger here as it might cause a full re-render
+                        // setRefreshTrigger(prev => prev + 1);
+                      }}
                     />
                   }
                 </div>
