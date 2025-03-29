@@ -184,6 +184,46 @@ const Household: React.FC = () => {
     return Array.from(categoryMap, ([name, value]) => ({ name, value }));
   };
 
+  const calculateUserContribution = () => {
+    if (!user?.id || transactions.length === 0) return 0;
+    
+    const totalExpenses = calculateTotalExpenses();
+    if (totalExpenses === 0) return 0;
+    
+    // Get the full name of the current user
+    const userName = user?.fullName || `${user?.firstName || ''} ${user?.lastName || ''}`.trim();
+    
+    // Calculate how much this user has contributed
+    const userContribution = transactions.reduce((total, transaction) => {
+      if (transaction.userfullname === userName) {
+        return total + parseFloat(transaction.amount?.toString() || "0");
+      }
+      return total;
+    }, 0);
+    
+    // Return as a percentage
+    return (userContribution / totalExpenses) * 100;
+  };
+
+  // Prepare data for the user contribution chart
+  const prepareUserContributionData = () => {
+    // Group transactions by user and sum amounts
+    const userMap = new Map<string, number>();
+    
+    transactions.forEach(transaction => {
+      const username = transaction.userfullname || 'Unknown';
+      const amount = parseFloat(transaction.amount?.toString() || "0");
+      
+      if (userMap.has(username)) {
+        userMap.set(username, (userMap.get(username) || 0) + amount);
+      } else {
+        userMap.set(username, amount);
+      }
+    });
+    
+    // Convert map to array for the pie chart
+    return Array.from(userMap, ([name, value]) => ({ name, value }));
+  };
   // Calculate total expenses
   const calculateTotalExpenses = () => {
     return transactions.reduce((total, transaction) => {
@@ -275,9 +315,16 @@ const Household: React.FC = () => {
               <div className="summary-trend">This month</div>
             </div>
             <div className="summary-card">
-              <h3>Your Balance</h3>
-              <div className="summary-value">$0.00</div>
-              <div className="summary-trend">No unsettled expenses</div>
+              <h3>Your Contribution</h3>
+              <div className="summary-value">{calculateUserContribution().toFixed(1)}%</div>
+              <div className="summary-trend">
+                {calculateUserContribution() > 0 
+                  ? `$${transactions
+                      .filter(t => t.userfullname === (user?.fullName || `${user?.firstName || ''} ${user?.lastName || ''}`.trim()))
+                      .reduce((sum, t) => sum + parseFloat(t.amount?.toString() || "0"), 0)
+                      .toFixed(2)}`
+                  : 'No contributions yet'}
+              </div>
             </div>
             <div className="summary-card">
               <h3>Household Members</h3>
@@ -429,25 +476,60 @@ const Household: React.FC = () => {
                   )}
                 </div>
               </div>
-              
-              {/* Recent Transactions */}
+              {/* Insert the new User Contribution Chart HERE */}
               <div className="card">
                 <div className="card-header">
-                  <h2>Recent Transactions</h2>
-                  {household && 
-                    <AddHouseholdTransaction 
-                      householdId={household.id} 
-                      userId={user?.id} 
-                      onTransactionAdded={refreshData}
-                    />
-                  }
+                  <h2>Expense Contributions</h2>
                 </div>
                 <div className="card-content">
-                  {transactions.length === 0 ? (
-                    <p>No transactions yet. Add your first expense!</p>
+                  {transactions.length > 0 ? (
+                    <div className="chart-container" style={{ height: 300 }}>
+                      <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                          <Pie
+                            data={prepareUserContributionData()}
+                            cx="50%"
+                            cy="50%"
+                            labelLine={false}
+                            outerRadius={80}
+                            fill="#8884d8"
+                            dataKey="value"
+                            label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                          >
+                            {prepareUserContributionData().map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                            ))}
+                          </Pie>
+                          <Tooltip formatter={(value) => [`$${value}`, 'Amount']} />
+                          <Legend />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    </div>
                   ) : (
+                    <p className="empty-chart-message">Add expenses to see contribution distribution</p>
+                  )}
+                </div>
+              </div>
+              {/* Recent Transactions */}
+              <div className="card">
+              <div className="card-header">
+                <h2>Recent Transactions</h2>
+                {household && 
+                  <AddHouseholdTransaction 
+                    householdId={household.id} 
+                    userId={user?.id} 
+                    onTransactionAdded={refreshData}
+                  />
+                }
+              </div>
+              <div className="card-content">
+                {transactions.length === 0 ? (
+                  <p>No transactions yet. Add your first expense!</p>
+                ) : (
+                  <>
                     <ul className="transactions-list">
-                      {transactions.map(transaction => (
+                      {/* Only show the first 5 transactions */}
+                      {transactions.slice(0, 3).map(transaction => (
                         <li key={transaction.id} className="transaction-item">
                           <div className="transaction-details">
                             <div className="transaction-name">{transaction.name}</div>
@@ -468,8 +550,18 @@ const Household: React.FC = () => {
                         </li>
                       ))}
                     </ul>
-                  )}
-                </div>
+                    
+                    {/* Show a "View All" link if there are more than 5 transactions */}
+                    {transactions.length > 5 && (
+                      <div className="view-all-link">
+                        <button className="button button-secondary">
+                          View All {transactions.length} Transactions
+                        </button>
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
               </div>
             </div>
           </div>

@@ -323,3 +323,20 @@
   font-size: 14px;
   border-left: 4px solid #d32f2f;
 }
+
+.contribution-percent {
+  font-size: 12px;
+  color: #757575;
+  margin-left: 4px;
+}
+
+.view-all-link {
+  text-align: center;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.view-all-link .button {
+  font-size: 14px;
+}
