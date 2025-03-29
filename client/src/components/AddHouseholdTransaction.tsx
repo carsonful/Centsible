@@ -1,13 +1,24 @@
 import React, { useState } from 'react';
 import { transactionType } from '../types/types';
-import { addHouseholdTransaction } from '../firebase/firebase'; // We'll need to create this function
-import './AddTransaction.css'; // We can reuse the same CSS
-import { useUser } from '@clerk/clerk-react'
+import { addHouseholdTransaction } from '../firebase/firebase';
+import './AddHouseHoldTransaction.css'; // Create this file with the CSS above
+import { useUser } from '@clerk/clerk-react';
+
 // Define props interface
 interface AddHouseholdTransactionProps {
   householdId: string | undefined;
   userId: string | undefined;
 }
+
+// Predefined categories with colors
+const CATEGORIES = [
+  { id: 'rent', label: 'Rent', color: '#2196F3' },
+  { id: 'utilities', label: 'Utilities', color: '#4CAF50' },
+  { id: 'groceries', label: 'Groceries', color: '#FF9800' },
+  { id: 'household', label: 'Household Items', color: '#9C27B0' },
+  { id: 'internet', label: 'Internet', color: '#00BCD4' },
+  { id: 'other', label: 'Other', color: '#757575' },
+];
 
 // Use the props interface in the component definition
 const AddHouseholdTransaction: React.FC<AddHouseholdTransactionProps> = ({ householdId, userId }) => {
@@ -23,12 +34,18 @@ const AddHouseholdTransaction: React.FC<AddHouseholdTransactionProps> = ({ house
     userfullname: user?.fullName || '',
   });
 
+  // Close modal when clicking outside
+  const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (e.target === e.currentTarget) {
+      setIsOpen(false);
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log('Household transaction added:', transaction);
     
     // Call the function to add transaction to household
-
     addHouseholdTransaction(householdId, userId, transaction);
     
     setIsOpen(false);
@@ -50,64 +67,108 @@ const AddHouseholdTransaction: React.FC<AddHouseholdTransactionProps> = ({ house
     }));
   };
 
+  const handleCategorySelect = (category: string) => {
+    setTransaction(prev => ({ ...prev, category }));
+  };
+
   return (
     <>
       <button className="button button-primary" onClick={() => setIsOpen(true)}>
         Add Household Expense
       </button>
       {isOpen && (
-        <div className="popup-overlay">
+        <div className="popup-overlay" onClick={handleOverlayClick}>
           <div className="popup">
             <h3>Add Household Expense</h3>
             <form onSubmit={handleSubmit}>
-              <input
-                type="text"
-                name="name"
-                placeholder="Expense name"
-                value={transaction.name || ''}
-                onChange={handleChange}
-                required
-              />
-              <input
-                type="number"
-                name="amount"
-                placeholder="Amount"
-                value={transaction.amount || ''}
-                onChange={handleChange}
-                step="0.01"
-                required
-              />
-              <select
-                name="category"
-                value={transaction.category || ''}
-                onChange={handleChange}
-                required
-              >
-                <option value="">Select category</option>
-                <option value="Rent">Rent</option>
-                <option value="Utilities">Utilities</option>
-                <option value="Groceries">Groceries</option>
-                <option value="Household Items">Household Items</option>
-                <option value="Internet">Internet</option>
-                <option value="Other">Other</option>
-              </select>
-              <input
-                type="date"
-                name="date"
-                value={transaction.date instanceof Date ? transaction.date.toISOString().split('T')[0] : ''}
-                onChange={handleChange}
-                required
-              />
-              <textarea
-                name="notes"
-                placeholder="Notes (optional)"
-                value={transaction.notes || ''}
-                onChange={handleChange}
-                rows={3}
-              />
+              <div className="form-group">
+                <label htmlFor="expense-name">Expense Name</label>
+                <input
+                  id="expense-name"
+                  type="text"
+                  name="name"
+                  placeholder="What is this expense for?"
+                  value={transaction.name || ''}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              
+              <div className="form-group">
+                <label htmlFor="expense-amount">Amount</label>
+                <input
+                  id="expense-amount"
+                  type="number"
+                  name="amount"
+                  placeholder="0.00"
+                  value={transaction.amount || ''}
+                  onChange={handleChange}
+                  step="0.01"
+                  required
+                />
+              </div>
+              
+              <div className="form-group">
+                <label>Category</label>
+                <div className="category-selector">
+                  {CATEGORIES.map(cat => (
+                    <div 
+                      key={cat.id}
+                      className={`category-chip ${transaction.category === cat.id ? 'selected' : ''}`}
+                      style={{
+                        backgroundColor: transaction.category === cat.id ? `${cat.color}20` : undefined,
+                        color: transaction.category === cat.id ? cat.color : undefined,
+                        borderColor: transaction.category === cat.id ? cat.color : undefined
+                      }}
+                      onClick={() => handleCategorySelect(cat.id)}
+                    >
+                      {cat.label}
+                    </div>
+                  ))}
+                </div>
+                
+                {/* Keep the select as fallback/for accessibility */}
+                <select
+                  name="category"
+                  value={transaction.category || ''}
+                  onChange={handleChange}
+                  required
+                  style={{ display: 'none' }}
+                >
+                  <option value="">Select category</option>
+                  {CATEGORIES.map(cat => (
+                    <option key={cat.id} value={cat.id}>{cat.label}</option>
+                  ))}
+                </select>
+              </div>
+              
+              <div className="form-group">
+                <label htmlFor="expense-date">Date</label>
+                <input
+                  id="expense-date"
+                  type="date"
+                  name="date"
+                  value={transaction.date instanceof Date ? transaction.date.toISOString().split('T')[0] : ''}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              
+              <div className="form-group">
+                <label htmlFor="expense-notes">Notes (Optional)</label>
+                <textarea
+                  id="expense-notes"
+                  name="notes"
+                  placeholder="Any additional details about this expense..."
+                  value={transaction.notes || ''}
+                  onChange={handleChange}
+                  rows={3}
+                />
+              </div>
+              
               <div className="popup-buttons">
                 <button type="button" onClick={() => setIsOpen(false)}>Cancel</button>
-                <button type="submit">Save</button>
+                <button type="submit">Save Expense</button>
               </div>
             </form>
           </div>

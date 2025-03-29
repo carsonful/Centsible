@@ -1,0 +1,124 @@
+/* PendingInvitations.css */
+
+.pending-invitations {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 24px;
+    overflow: hidden;
+    animation: fadeIn 0.5s ease;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  .pending-invitations h3 {
+    background-color: #f8f9fa;
+    color: #2E7D32;
+    padding: 16px 20px;
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  
+  .invitations-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .invitation-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid #f0f0f0;
+    transition: background-color 0.2s ease;
+  }
+  
+  .invitation-item:last-child {
+    border-bottom: none;
+  }
+  
+  .invitation-item:hover {
+    background-color: #f9f9f9;
+  }
+  
+  .invitation-details {
+    flex: 1;
+  }
+  
+  .invitation-title {
+    font-weight: 500;
+    color: #212121;
+    margin-bottom: 4px;
+  }
+  
+  .invitation-meta {
+    font-size: 13px;
+    color: #757575;
+  }
+  
+  .invitation-actions {
+    margin-left: 16px;
+  }
+  
+  .invitation-actions button {
+    background-color: #2E7D32;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  
+  .invitation-actions button:hover {
+    background-color: #1B5E20;
+  }
+  
+  .invitation-actions button.secondary {
+    background-color: transparent;
+    color: #757575;
+    border: 1px solid #e0e0e0;
+    margin-right: 8px;
+  }
+  
+  .invitation-actions button.secondary:hover {
+    background-color: #f5f5f5;
+  }
+  
+  /* For empty state */
+  .no-invitations {
+    padding: 24px;
+    text-align: center;
+    color: #757575;
+  }
+  
+  /* Loading state */
+  .loading-invitations {
+    padding: 16px;
+    text-align: center;
+    color: #757575;
+    font-size: 14px;
+  }
+  
+  /* Badge for number of invitations */
+  .invitations-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #2E7D32;
+    color: white;
+    font-size: 12px;
+    border-radius: 12px;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    margin-left: 8px;
+  }
