@@ -352,13 +352,14 @@ const Household: React.FC = () => {
             <div className="summary-card">
               <h3>Your Contribution</h3>
               <div className="summary-value">{calculateUserContribution().toFixed(1)}%</div>
-              <div className="summary-trend">
+              <div className="summary-trend">Out of  
                 {calculateUserContribution() > 0 
-                  ? `$${transactions
+                  ? ` $${transactions
                       .filter(t => t.userfullname === (user?.fullName || `${user?.firstName || ''} ${user?.lastName || ''}`.trim()))
                       .reduce((sum, t) => sum + parseFloat(t.amount?.toString() || "0"), 0)
-                      .toFixed(2)}`
+                      .toFixed(2)} `
                   : 'No contributions yet'}
+                   total
               </div>
             </div>
             
@@ -483,7 +484,23 @@ const Household: React.FC = () => {
                     <AddHouseholdTransaction 
                       householdId={household.id} 
                       userId={user?.id} 
-                      onTransactionAdded={refreshData}
+                      onTransactionAdded={() => {
+                        // Use a more controlled approach to refresh data
+                        const fetchTransactions = async () => {
+                          try {
+                            if (household?.id) {
+                              const householdTransactions = await getHouseholdTransactions(household.id);
+                              setTransactions(householdTransactions);
+                            }
+                          } catch (error) {
+                            console.error("Error fetching transactions:", error);
+                          }
+                        };
+                        
+                        fetchTransactions();
+                        // Don't increment refreshTrigger here as it might cause a full re-render
+                        // setRefreshTrigger(prev => prev + 1);
+                      }}
                     />
                   }
                 </div>
