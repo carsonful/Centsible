@@ -5,6 +5,21 @@ import { usertype, householdType, transactionType } from '../../../types/types';
 import { useUser } from '@clerk/clerk-react';
 import AddHouseholdTransaction from '../../../components/AddHouseholdTransaction';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
+import { collection, getDocs, getFirestore } from 'firebase/firestore';
+
+// Get firestore instance from your firebase config
+const db = getFirestore();
+
+// Define a member type to include role information
+interface HouseholdMember {
+  userId: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  role: string;
+  joined: boolean;
+  joinedAt: Date;
+}
 
 const Household: React.FC = () => {
   const { user } = useUser();
@@ -17,6 +32,9 @@ const Household: React.FC = () => {
   const [transactions, setTransactions] = useState<transactionType[]>([]);
   const [isInviting, setIsInviting] = useState(false);
   const [inviteEmail, setInviteEmail] = useState('');
+  const [members, setMembers] = useState<HouseholdMember[]>([]);
+  // Add a refresh trigger
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
   
   // Colors for the pie chart
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'];
@@ -27,6 +45,12 @@ const Household: React.FC = () => {
     firstName: user?.firstName,
     lastName: user?.lastName,
     emailAddress: user?.emailAddresses[0].emailAddress
+  };
+
+  // Function to refresh data
+  const refreshData = () => {
+    // Increment the trigger to cause effect to re-run
+    setRefreshTrigger(prev => prev + 1);
   };
 
   // Fetch user's household
@@ -45,6 +69,22 @@ const Household: React.FC = () => {
           const householdTransactions = await getHouseholdTransactions(userHousehold.id);
           console.log("Household transactions:", householdTransactions);
           setTransactions(householdTransactions);
+          
+          // Fetch household members
+          const householdMembersRef = collection(db, "households", userHousehold.id, "members");
+          const membersSnapshot = await getDocs(householdMembersRef);
+          
+          const fetchedMembers: HouseholdMember[] = [];
+          membersSnapshot.forEach(doc => {
+            if (doc.data().joined) {
+              fetchedMembers.push({
+                ...doc.data(),
+                joinedAt: doc.data().joinedAt?.toDate()
+              } as HouseholdMember);
+            }
+          });
+          
+          setMembers(fetchedMembers);
         }
       } catch (error) {
         console.error("Error fetching household:", error);
@@ -55,7 +95,7 @@ const Household: React.FC = () => {
     };
     
     fetchUserHousehold();
-  }, [user?.id]);
+  }, [user?.id, refreshTrigger]); // Add refreshTrigger to the dependency array
 
   const handleCreateHousehold = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -242,7 +282,7 @@ const Household: React.FC = () => {
             </div>
             <div className="summary-card">
               <h3>Household Members</h3>
-              <div className="summary-value">1</div>
+              <div className="summary-value">{members.length}</div>
               <div className="summary-trend">Active members</div>
             </div>
             <div className="summary-card">
@@ -311,16 +351,32 @@ const Household: React.FC = () => {
                     </form>
                   ) : (
                     <ul className="members-list">
-                      <li className="member-item">
-                        <div className="member-avatar">
-                          <img src={user?.imageUrl || 'https://via.placeholder.com/40'} alt="User avatar" />
-                        </div>
-                        <div className="member-details">
-                          <div className="member-name">{user?.fullName || `${user?.firstName} ${user?.lastName}`}</div>
-                          <div className="member-role">Owner</div>
-                        </div>
-                      </li>
-                      {/* Add more members as they are added to the household */}
+                      {members.length > 0 ? (
+                        members.map((member, index) => (
+                          <li key={index} className="member-item">
+                            <div className="member-avatar">
+                              {/* Use first letter of first name as fallback */}
+                              {member.firstName ? member.firstName.charAt(0).toUpperCase() : '?'}
+                            </div>
+                            <div className="member-details">
+                              <div className="member-name">
+                                {`${member.firstName} ${member.lastName}`}
+                              </div>
+                              <div className="member-role">{member.role}</div>
+                            </div>
+                          </li>
+                        ))
+                      ) : (
+                        <li className="member-item">
+                          <div className="member-avatar">
+                            {user?.firstName ? user.firstName.charAt(0).toUpperCase() : '?'}
+                          </div>
+                          <div className="member-details">
+                            <div className="member-name">{user?.fullName || `${user?.firstName} ${user?.lastName}`}</div>
+                            <div className="member-role">Owner</div>
+                          </div>
+                        </li>
+                      )}
                     </ul>
                   )}
                 </div>
@@ -368,7 +424,13 @@ const Household: React.FC = () => {
               <div className="card">
                 <div className="card-header">
                   <h2>Recent Transactions</h2>
-                  {household && <AddHouseholdTransaction householdId={household.id} userId={user?.id} />}
+                  {household && 
+                    <AddHouseholdTransaction 
+                      householdId={household.id} 
+                      userId={user?.id} 
+                      onTransactionAdded={refreshData}
+                    />
+                  }
                 </div>
                 <div className="card-content">
                   {transactions.length === 0 ? (

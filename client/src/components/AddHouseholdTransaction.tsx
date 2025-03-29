@@ -1,14 +1,8 @@
 import React, { useState } from 'react';
 import { transactionType } from '../types/types';
 import { addHouseholdTransaction } from '../firebase/firebase';
-import './AddHouseHoldTransaction.css'; // Create this file with the CSS above
+import './AddHouseHoldTransaction.css';
 import { useUser } from '@clerk/clerk-react';
-
-// Define props interface
-interface AddHouseholdTransactionProps {
-  householdId: string | undefined;
-  userId: string | undefined;
-}
 
 // Predefined categories with colors
 const CATEGORIES = [
@@ -20,8 +14,19 @@ const CATEGORIES = [
   { id: 'other', label: 'Other', color: '#757575' },
 ];
 
+// Define props interface with the callback
+interface AddHouseholdTransactionProps {
+  householdId: string | undefined;
+  userId: string | undefined;
+  onTransactionAdded?: () => void; // Add callback prop
+}
+
 // Use the props interface in the component definition
-const AddHouseholdTransaction: React.FC<AddHouseholdTransactionProps> = ({ householdId, userId }) => {
+const AddHouseholdTransaction: React.FC<AddHouseholdTransactionProps> = ({ 
+  householdId, 
+  userId,
+  onTransactionAdded 
+}) => {
   const [isOpen, setIsOpen] = useState(false);
   const { user } = useUser();
   
@@ -31,7 +36,7 @@ const AddHouseholdTransaction: React.FC<AddHouseholdTransactionProps> = ({ house
     category: '',
     date: new Date(),
     notes: '',
-    userfullname: user?.fullName || '',
+    userfullname: user?.fullName || `${user?.firstName || ''} ${user?.lastName || ''}`.trim(),
   });
 
   // Close modal when clicking outside
@@ -41,22 +46,39 @@ const AddHouseholdTransaction: React.FC<AddHouseholdTransactionProps> = ({ house
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Household transaction added:', transaction);
     
-    // Call the function to add transaction to household
-    addHouseholdTransaction(householdId, userId, transaction);
+    // Always set the user's full name for each transaction
+    const transactionWithUser = {
+      ...transaction,
+      userfullname: user?.fullName || `${user?.firstName || ''} ${user?.lastName || ''}`.trim()
+    };
     
-    setIsOpen(false);
-    // Reset the form
-    setTransaction({
-      name: '',
-      amount: undefined,
-      category: '',
-      date: new Date(),
-      notes: ''
-    });
+    console.log('Household transaction added:', transactionWithUser);
+    
+    try {
+      // Call the function to add transaction to household
+      await addHouseholdTransaction(householdId, userId, transactionWithUser);
+      
+      // Close the modal and reset the form
+      setIsOpen(false);
+      setTransaction({
+        name: '',
+        amount: undefined,
+        category: '',
+        date: new Date(),
+        notes: ''
+      });
+      
+      // Call the refresh callback if provided
+      if (onTransactionAdded) {
+        onTransactionAdded();
+      }
+    } catch (error) {
+      console.error("Error adding transaction:", error);
+      // Could add error handling UI here
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
