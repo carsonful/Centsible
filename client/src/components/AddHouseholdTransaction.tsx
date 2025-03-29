@@ -7,7 +7,6 @@ import { useUser } from '@clerk/clerk-react'
 interface AddHouseholdTransactionProps {
   householdId: string | undefined;
   userId: string | undefined;
-  fullname: string | undefined;
 }
 
 // Use the props interface in the component definition

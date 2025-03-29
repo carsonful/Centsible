@@ -1,171 +1,316 @@
 /* Household.css */
 .household-container {
-    width: 100%;
-  }
-  
-  /* You can leverage existing styles from Dashboard.css for cards and other elements *//* Add to Household.css */
-.invitations-card {
-    margin-bottom: 24px;
-  }
-  
-  .invitations-list {
-    list-style: none;
-    padding: 0;
-  }
-  
-  .invitation-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 16px 0;
-    border-bottom: 1px solid #e0e0e0;
-  }
-  
-  .invitation-item:last-child {
-    border-bottom: none;
-  }
-  
-  .invitation-details {
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .invitation-title {
-    font-size: 16px;
-    margin-bottom: 4px;
-  }
-  
-  .invitation-info {
-    font-size: 14px;
-    color: #757575;
-  }
-  
-  .invitation-actions {
-    display: flex;
-    gap: 12px;
-  }
+  width: 100%;
+}
 
+/* Card styles */
+.card {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 24px;
+  margin-bottom: 20px;
+}
 
-  /* Household.css */
-.household-container {
-    width: 100%;
-  }
-  
-  .form-group {
-    margin-bottom: 20px;
-  }
-  
-  .form-group label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: 500;
-  }
-  
-  .form-group input {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #e0e0e0;
-    border-radius: 4px;
-    font-size: 14px;
-  }
-  
-  .form-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    margin-top: 20px;
-  }
-  
-  .error-message {
-    color: #f44336;
-    margin-top: 10px;
-    font-size: 14px;
-  }
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
 
-  /* Household.css */
-.household-container {
-    width: 100%;
+.card-header h2 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #212121;
+}
+
+.card-content {
+  padding: 8px 0 16px 0;
+}
+
+/* Form styles */
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 500;
+}
+
+.form-group input, 
+.form-group select, 
+.form-group textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.error-message {
+  color: #f44336;
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+.loading-text {
+  text-align: center;
+  padding: 20px;
+  color: #757575;
+}
+
+/* Button styles */
+.button {
+  background-color: #2E7D32;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.button:hover {
+  background-color: #1B5E20;
+}
+
+.button-secondary {
+  background-color: transparent;
+  color: #2E7D32;
+  border: 1px solid #2E7D32;
+}
+
+.button-secondary:hover {
+  background-color: rgba(46, 125, 50, 0.1);
+}
+
+/* Household details */
+.household-details h3 {
+  font-size: 18px;
+  margin-bottom: 8px;
+}
+
+.household-role {
+  color: #757575;
+  font-size: 14px;
+}
+
+/* Summary cards */
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.summary-card {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+}
+
+.summary-card h3 {
+  color: #757575;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.summary-value {
+  font-size: 24px;
+  font-weight: 600;
+  color: #212121;
+}
+
+.summary-trend {
+  font-size: 14px;
+  margin-top: 4px;
+}
+
+.positive {
+  color: #66BB6A;
+}
+
+.negative {
+  color: #EF5350;
+}
+
+/* Two-column layout for household dashboard */
+.household-grid {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 20px;
+  margin-top: 20px;
+  margin-bottom: 40px;
+}
+
+@media (max-width: 768px) {
+  .household-grid {
+    grid-template-columns: 1fr;
   }
-  
-  .form-group {
-    margin-bottom: 20px;
-  }
-  
-  .form-group label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: 500;
-  }
-  
-  .form-group input {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #e0e0e0;
-    border-radius: 4px;
-    font-size: 14px;
-  }
-  
-  .form-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    margin-top: 20px;
-  }
-  
-  .error-message {
-    color: #f44336;
-    margin-top: 10px;
-    font-size: 14px;
-  }
-  
-  .loading-text {
-    text-align: center;
-    padding: 20px;
-    color: #757575;
-  }
-  
-  .household-details h3 {
-    font-size: 18px;
-    margin-bottom: 8px;
-  }
-  
-  .household-role {
-    color: #757575;
-    font-size: 14px;
-  }
-  
-  .transactions-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-  
-  .transaction-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 0;
-    border-bottom: 1px solid #e0e0e0;
-  }
-  
-  .transaction-item:last-child {
-    border-bottom: none;
-  }
-  
-  .transaction-details {
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .transaction-name {
-    font-weight: 500;
-  }
-  
-  .transaction-date {
-    font-size: 14px;
-    color: #757575;
-  }
-  
-  .transaction-amount {
-    font-weight: 500;
-  }
+}
+
+/* Member list styles */
+.members-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.member-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.member-item:last-child {
+  border-bottom: none;
+}
+
+.member-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin-right: 16px;
+  background-color: #e0e0e0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
+}
+
+.member-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.member-details {
+  flex: 1;
+}
+
+.member-name {
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+
+.member-role {
+  font-size: 14px;
+  color: #757575;
+}
+
+/* Transaction list styles */
+.transactions-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.transaction-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 0;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.transaction-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.transaction-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.transaction-name {
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.transaction-meta {
+  display: flex;
+  gap: 12px;
+  font-size: 14px;
+  color: #757575;
+  margin-bottom: 4px;
+}
+
+.transaction-category {
+  background-color: #e3f2fd;
+  color: #1976d2;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+}
+
+.transaction-paid-by {
+  font-size: 12px;
+}
+
+.transaction-date {
+  font-size: 12px;
+  color: #9e9e9e;
+}
+
+.transaction-amount {
+  font-weight: 600;
+  font-size: 16px;
+  color: #2E7D32;
+}
+
+/* Negative amounts (debits) */
+.transaction-amount.negative {
+  color: #EF5350;
+}
+
+/* Invite form */
+.invite-form {
+  margin-top: 10px;
+}
+
+/* Chart container */
+.chart-container {
+  width: 100%;
+  height: 300px;
+  padding-bottom: 20px;
+}
+
+.empty-chart-message {
+  text-align: center;
+  padding: 50px 0;
+  color: #757575;
+}
+
+/* Page title */
+.page-title {
+  margin-bottom: 24px;
+}
+
+.page-title h1 {
+  font-size: 28px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #212121;
+}
+
+.page-title p {
+  color: #757575;
+  font-size: 16px;
+}
