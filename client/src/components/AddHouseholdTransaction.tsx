@@ -30,6 +30,9 @@ const AddHouseholdTransaction: React.FC<AddHouseholdTransactionProps> = ({
   const [isOpen, setIsOpen] = useState(false);
   const { user } = useUser();
   
+  // Format today's date in YYYY-MM-DD format for the date input
+  const today = new Date().toISOString().split('T')[0];
+  
   const [transaction, setTransaction] = useState<transactionType>({
     name: '',
     amount: undefined,
@@ -83,10 +86,21 @@ const AddHouseholdTransaction: React.FC<AddHouseholdTransactionProps> = ({
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setTransaction(prev => ({ 
-      ...prev, 
-      [name]: name === 'amount' ? parseFloat(value) : value 
-    }));
+    
+    // Special handling for date inputs
+    if (name === 'date') {
+      // Convert the string date from the input to a Date object
+      const dateValue = new Date(value);
+      setTransaction(prev => ({ 
+        ...prev, 
+        [name]: dateValue
+      }));
+    } else {
+      setTransaction(prev => ({ 
+        ...prev, 
+        [name]: name === 'amount' ? parseFloat(value) : value 
+      }));
+    }
   };
 
   const handleCategorySelect = (category: string) => {
@@ -96,7 +110,7 @@ const AddHouseholdTransaction: React.FC<AddHouseholdTransactionProps> = ({
   return (
     <>
       <button className="button button-primary" onClick={() => setIsOpen(true)}>
-        Add Household Expense
+        Add Expense
       </button>
       {isOpen && (
         <div className="popup-overlay" onClick={handleOverlayClick}>
@@ -170,8 +184,11 @@ const AddHouseholdTransaction: React.FC<AddHouseholdTransactionProps> = ({
                   id="expense-date"
                   type="date"
                   name="date"
-                  value={transaction.date instanceof Date ? transaction.date.toISOString().split('T')[0] : ''}
+                  value={transaction.date instanceof Date ? 
+                    transaction.date.toISOString().split('T')[0] : 
+                    today}
                   onChange={handleChange}
+                  max={today}
                   required
                 />
               </div>

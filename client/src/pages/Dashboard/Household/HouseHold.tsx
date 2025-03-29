@@ -5,8 +5,8 @@ import { usertype, householdType, transactionType } from '../../../types/types';
 import { useUser } from '@clerk/clerk-react';
 import AddHouseholdTransaction from '../../../components/AddHouseholdTransaction';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
-import { collection, getDocs, getFirestore } from 'firebase/firestore';
-
+import { collection, getDocs, getFirestore, query, where } from 'firebase/firestore';
+import ViewAllTransactions from '../../../components/ViewAllTransactions';
 // Get firestore instance from your firebase config
 const db = getFirestore();
 
@@ -33,6 +33,7 @@ const Household: React.FC = () => {
   const [isInviting, setIsInviting] = useState(false);
   const [inviteEmail, setInviteEmail] = useState('');
   const [members, setMembers] = useState<HouseholdMember[]>([]);
+  const [showAllTransactions, setShowAllTransactions] = useState(false);
   // Add a refresh trigger
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   
@@ -142,11 +143,14 @@ const Household: React.FC = () => {
     setError(null);
     
     try {
+      console.log("About to call inviteUserToHousehold function");
       const result = await inviteUserToHousehold(
         household.id,
         inviteEmail,
         user.id
       );
+      
+      console.log("Invitation result:", result);
       
       if (result.success) {
         alert(result.message);
@@ -156,12 +160,18 @@ const Household: React.FC = () => {
         setError(result.message);
       }
     } catch (err) {
-      console.error(err);
-      setError('An error occurred while sending the invitation.');
+      console.error("Error in invitation process:", err);
+      if (err instanceof Error) {
+        setError(`Error: ${err.message}`);
+      } else {
+        setError('An error occurred while sending the invitation.');
+      }
     } finally {
       setIsLoading(false);
+      console.log("Invitation process completed");
     }
   };
+
   // Prepare data for the pie chart
   const prepareCategoryData = () => {
     // Group transactions by category and sum amounts
@@ -184,27 +194,6 @@ const Household: React.FC = () => {
     return Array.from(categoryMap, ([name, value]) => ({ name, value }));
   };
 
-  const calculateUserContribution = () => {
-    if (!user?.id || transactions.length === 0) return 0;
-    
-    const totalExpenses = calculateTotalExpenses();
-    if (totalExpenses === 0) return 0;
-    
-    // Get the full name of the current user
-    const userName = user?.fullName || `${user?.firstName || ''} ${user?.lastName || ''}`.trim();
-    
-    // Calculate how much this user has contributed
-    const userContribution = transactions.reduce((total, transaction) => {
-      if (transaction.userfullname === userName) {
-        return total + parseFloat(transaction.amount?.toString() || "0");
-      }
-      return total;
-    }, 0);
-    
-    // Return as a percentage
-    return (userContribution / totalExpenses) * 100;
-  };
-
   // Prepare data for the user contribution chart
   const prepareUserContributionData = () => {
     // Group transactions by user and sum amounts
@@ -224,11 +213,55 @@ const Household: React.FC = () => {
     // Convert map to array for the pie chart
     return Array.from(userMap, ([name, value]) => ({ name, value }));
   };
+
+  const calculateRecentExpenses = () => {
+    // Calculate date from 30 days ago
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    
+    // Filter transactions to only include those from the past 30 days
+    return transactions
+      .filter(transaction => {
+        // Make sure transaction.date is a Date object
+        const transactionDate = transaction.date instanceof Date 
+          ? transaction.date 
+          : new Date(transaction.date);
+        
+        // Check if the transaction date is after 30 days ago
+        return transactionDate >= thirtyDaysAgo;
+      })
+      .reduce((total, transaction) => {
+        return total + parseFloat(transaction.amount?.toString() || "0");
+      }, 0);
+  };
+
   // Calculate total expenses
   const calculateTotalExpenses = () => {
     return transactions.reduce((total, transaction) => {
       return total + parseFloat(transaction.amount?.toString() || "0");
     }, 0);
+  };
+
+  // Calculate the current user's contribution percentage
+  const calculateUserContribution = () => {
+    if (!user?.id || transactions.length === 0) return 0;
+    
+    const totalExpenses = calculateTotalExpenses();
+    if (totalExpenses === 0) return 0;
+    
+    // Get the full name of the current user
+    const userName = user?.fullName || `${user?.firstName || ''} ${user?.lastName || ''}`.trim();
+    
+    // Calculate how much this user has contributed
+    const userContribution = transactions.reduce((total, transaction) => {
+      if (transaction.userfullname === userName) {
+        return total + parseFloat(transaction.amount?.toString() || "0");
+      }
+      return total;
+    }, 0);
+    
+    // Return as a percentage
+    return (userContribution / totalExpenses) * 100;
   };
 
   return (
@@ -311,9 +344,11 @@ const Household: React.FC = () => {
           <div className="summary-grid">
             <div className="summary-card">
               <h3>Total Expenses</h3>
-              <div className="summary-value">${calculateTotalExpenses().toFixed(2)}</div>
-              <div className="summary-trend">This month</div>
+              <div className="summary-value">${calculateRecentExpenses().toFixed(2)}</div>
+              <div className="summary-trend">Past 30 days</div>
             </div>
+            
+            {/* New contribution card */}
             <div className="summary-card">
               <h3>Your Contribution</h3>
               <div className="summary-value">{calculateUserContribution().toFixed(1)}%</div>
@@ -326,6 +361,7 @@ const Household: React.FC = () => {
                   : 'No contributions yet'}
               </div>
             </div>
+            
             <div className="summary-card">
               <h3>Household Members</h3>
               <div className="summary-value">{members.length}</div>
@@ -438,6 +474,62 @@ const Household: React.FC = () => {
                   )}
                 </div>
               </div>
+              
+              {/* Recent Transactions - moved to left column */}
+              <div className="card">
+                <div className="card-header">
+                  <h2>Recent Transactions</h2>
+                  {household && 
+                    <AddHouseholdTransaction 
+                      householdId={household.id} 
+                      userId={user?.id} 
+                      onTransactionAdded={refreshData}
+                    />
+                  }
+                </div>
+                <div className="card-content">
+                  {transactions.length === 0 ? (
+                    <p>No transactions yet. Add your first expense!</p>
+                  ) : (
+                    <>
+                      <ul className="transactions-list compact">
+                        {transactions.slice(0, 3).map(transaction => (
+                          <li key={transaction.id} className="transaction-item">
+                            <div className="transaction-details">
+                              <div className="transaction-name">{transaction.name}</div>
+                              <div className="transaction-meta">
+                                <span className="transaction-category">{transaction.category}</span>
+                                <span className="transaction-paid-by">Paid by: {transaction.userfullname}</span>
+                              </div>
+                              <div className="transaction-date">
+                                {transaction.date instanceof Date 
+                                  ? transaction.date.toLocaleDateString() 
+                                  : 'No date'
+                                }
+                              </div>
+                            </div>
+                            <div className="transaction-amount">
+                              ${parseFloat(transaction.amount?.toString() || "0").toFixed(2)}
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
+                      
+                      {transactions.length > 5 && (
+                        <div className="view-all-link">
+                          <button 
+                            className="button button-secondary"
+                            onClick={() => setShowAllTransactions(true)}
+                          >
+                          View All {transactions.length} Transactions
+                          </button>
+                        </div>
+                        
+                      )}
+                    </>
+                  )}
+                </div>
+              </div>
             </div>
             
             {/* Right Column */}
@@ -476,7 +568,8 @@ const Household: React.FC = () => {
                   )}
                 </div>
               </div>
-              {/* Insert the new User Contribution Chart HERE */}
+              
+              {/* User Contribution Chart */}
               <div className="card">
                 <div className="card-header">
                   <h2>Expense Contributions</h2>
@@ -510,62 +603,15 @@ const Household: React.FC = () => {
                   )}
                 </div>
               </div>
-              {/* Recent Transactions */}
-              <div className="card">
-              <div className="card-header">
-                <h2>Recent Transactions</h2>
-                {household && 
-                  <AddHouseholdTransaction 
-                    householdId={household.id} 
-                    userId={user?.id} 
-                    onTransactionAdded={refreshData}
-                  />
-                }
-              </div>
-              <div className="card-content">
-                {transactions.length === 0 ? (
-                  <p>No transactions yet. Add your first expense!</p>
-                ) : (
-                  <>
-                    <ul className="transactions-list">
-                      {/* Only show the first 5 transactions */}
-                      {transactions.slice(0, 3).map(transaction => (
-                        <li key={transaction.id} className="transaction-item">
-                          <div className="transaction-details">
-                            <div className="transaction-name">{transaction.name}</div>
-                            <div className="transaction-meta">
-                              <span className="transaction-category">{transaction.category}</span>
-                              <span className="transaction-paid-by">Paid by: {transaction.userfullname}</span>
-                            </div>
-                            <div className="transaction-date">
-                              {transaction.date instanceof Date 
-                                ? transaction.date.toLocaleDateString() 
-                                : 'No date'
-                              }
-                            </div>
-                          </div>
-                          <div className="transaction-amount">
-                            ${parseFloat(transaction.amount?.toString() || "0").toFixed(2)}
-                          </div>
-                        </li>
-                      ))}
-                    </ul>
-                    
-                    {/* Show a "View All" link if there are more than 5 transactions */}
-                    {transactions.length > 5 && (
-                      <div className="view-all-link">
-                        <button className="button button-secondary">
-                          View All {transactions.length} Transactions
-                        </button>
-                      </div>
-                    )}
-                  </>
-                )}
-              </div>
-              </div>
             </div>
           </div>
         </>
+      )}
+      {showAllTransactions && (
+        <ViewAllTransactions 
+          transactions={transactions}
+          onClose={() => setShowAllTransactions(false)}
+        />
       )}
     </div>
   );
