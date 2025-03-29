@@ -18,7 +18,14 @@ const CATEGORIES = [
 interface AddHouseholdTransactionProps {
   householdId: string | undefined;
   userId: string | undefined;
-  onTransactionAdded?: () => void; // Add callback prop
+  onTransactionAdded?: () => void;
+}
+
+// Interface for our unified UI state
+interface UIState {
+  isOpen: boolean;
+  isSubmitting: boolean;
+  error: string | null;
 }
 
 // Use the props interface in the component definition
@@ -27,9 +34,13 @@ const AddHouseholdTransaction: React.FC<AddHouseholdTransactionProps> = ({
   userId,
   onTransactionAdded 
 }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  // Consolidated UI state
+  const [uiState, setUIState] = useState<UIState>({
+    isOpen: false,
+    isSubmitting: false,
+    error: null
+  });
+  
   const { user } = useUser();
   
   // Format today's date in YYYY-MM-DD format for the date input
@@ -47,24 +58,30 @@ const AddHouseholdTransaction: React.FC<AddHouseholdTransactionProps> = ({
     userfullname: userFullName,
   });
 
+  // Helper functions to update specific parts of UI state
+  const openModal = () => setUIState(prev => ({ ...prev, isOpen: true }));
+  const closeModal = () => setUIState(prev => ({ ...prev, isOpen: false }));
+  const setError = (error: string | null) => setUIState(prev => ({ ...prev, error }));
+  const setSubmitting = (isSubmitting: boolean) => setUIState(prev => ({ ...prev, isSubmitting }));
+
   // Close modal when clicking outside
   const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target === e.currentTarget) {
-      setIsOpen(false);
+      closeModal();
     }
   };
 
-  // Separate function to handle the actual submission logic
-  const submitTransaction = async () => {
+  // Button click handler for Save
+  const handleSaveClick = async () => {
     if (!householdId || !userId) {
       setError('Missing household or user information');
       return;
     }
     
-    setIsSubmitting(true);
+    setSubmitting(true);
     setError(null);
     
-    // Always set the user's full name for each transaction
+    // Create transaction object with user info
     const transactionWithUser = {
       ...transaction,
       userfullname: userFullName
@@ -75,7 +92,7 @@ const AddHouseholdTransaction: React.FC<AddHouseholdTransactionProps> = ({
       await addHouseholdTransaction(householdId, userId, transactionWithUser);
       
       // Close the modal and reset the form
-      setIsOpen(false);
+      closeModal();
       setTransaction({
         name: '',
         amount: undefined,
@@ -92,45 +109,24 @@ const AddHouseholdTransaction: React.FC<AddHouseholdTransactionProps> = ({
       console.error("Error adding transaction:", error);
       setError(error instanceof Error ? error.message : 'Failed to add transaction');
     } finally {
-      setIsSubmitting(false);
+      setSubmitting(false);
     }
   };
 
-  // Form submission handler
-  const handleSubmit = (e: React.FormEvent) => {
-    // Prevent the default form submission behavior
-    e.preventDefault();
-    
-    // Call our submission logic
-    submitTransaction();
-  };
-
+  // Handle form field changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     
-    // Special handling for date inputs
-    if (name === 'date') {
-      // Convert the string date from the input to a Date object
-      const dateValue = new Date(value);
-      setTransaction(prev => ({ 
-        ...prev, 
-        [name]: dateValue
-      }));
-    } else {
-      setTransaction(prev => ({ 
-        ...prev, 
-        [name]: name === 'amount' ? parseFloat(value) : value 
-      }));
-    }
+    setTransaction(prev => ({ 
+      ...prev, 
+      [name]: name === 'date' ? new Date(value) : 
+              name === 'amount' ? parseFloat(value) : value 
+    }));
   };
 
+  // Handle category selection
   const handleCategorySelect = (category: string) => {
     setTransaction(prev => ({ ...prev, category }));
-  };
-
-  // Handle the save button click separately
-  const handleSaveClick = () => {
-    submitTransaction();
   };
 
   return (
@@ -138,17 +134,20 @@ const AddHouseholdTransaction: React.FC<AddHouseholdTransactionProps> = ({
       <button 
         type="button" 
         className="button button-primary" 
-        onClick={() => setIsOpen(true)}
+        onClick={openModal}
       >
         Add Expense
       </button>
-      {isOpen && (
+      
+      {uiState.isOpen && (
         <div className="popup-overlay" onClick={handleOverlayClick}>
           <div className="popup">
             <h3>Add Household Expense</h3>
-            {error && (
-              <div className="error-message">{error}</div>
+            
+            {uiState.error && (
+              <div className="error-message">{uiState.error}</div>
             )}
+            
             <div className="form-group">
               <label htmlFor="expense-name">Expense Name</label>
               <input
@@ -195,7 +194,6 @@ const AddHouseholdTransaction: React.FC<AddHouseholdTransactionProps> = ({
                 ))}
               </div>
               
-              {/* Keep the select as fallback/for accessibility */}
               <select
                 name="category"
                 value={transaction.category || ''}
@@ -240,17 +238,17 @@ const AddHouseholdTransaction: React.FC<AddHouseholdTransactionProps> = ({
             <div className="popup-buttons">
               <button 
                 type="button" 
-                onClick={() => setIsOpen(false)}
-                disabled={isSubmitting}
+                onClick={closeModal}
+                disabled={uiState.isSubmitting}
               >
                 Cancel
               </button>
               <button 
                 type="button"
                 onClick={handleSaveClick}
-                disabled={isSubmitting}
+                disabled={uiState.isSubmitting}
               >
-                {isSubmitting ? 'Saving...' : 'Save Expense'}
+                {uiState.isSubmitting ? 'Saving...' : 'Save Expense'}
               </button>
             </div>
           </div>

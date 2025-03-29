@@ -352,13 +352,14 @@ const Household: React.FC = () => {
             <div className="summary-card">
               <h3>Your Contribution</h3>
               <div className="summary-value">{calculateUserContribution().toFixed(1)}%</div>
-              <div className="summary-trend">
+              <div className="summary-trend">Out of  
                 {calculateUserContribution() > 0 
-                  ? `$${transactions
+                  ? ` $${transactions
                       .filter(t => t.userfullname === (user?.fullName || `${user?.firstName || ''} ${user?.lastName || ''}`.trim()))
                       .reduce((sum, t) => sum + parseFloat(t.amount?.toString() || "0"), 0)
-                      .toFixed(2)}`
+                      .toFixed(2)} `
                   : 'No contributions yet'}
+                   total
               </div>
             </div>
             
