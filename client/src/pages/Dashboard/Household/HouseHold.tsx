@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './HouseHold.css';
-import { createHouseHold, getUserHousehold, getHouseholdTransactions } from '../../../firebase/firebase';
+import { createHouseHold, getUserHousehold, getHouseholdTransactions, inviteUserToHousehold } from '../../../firebase/firebase';
 import { usertype, householdType, transactionType } from '../../../types/types';
 import { useUser } from '@clerk/clerk-react';
 import AddHouseholdTransaction from '../../../components/AddHouseholdTransaction';
@@ -90,15 +90,37 @@ const Household: React.FC = () => {
     }
   };
 
-  const handleInviteMember = (e: React.FormEvent) => {
+  const handleInviteMember = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // TO DO: Implement the actual invitation functionality
-    // This would connect to your Firebase backend
+    if (!household?.id || !user?.id) {
+      setError('Missing household or user information');
+      return;
+    }
     
-    alert(`Invitation sent to ${inviteEmail}`);
-    setInviteEmail('');
-    setIsInviting(false);
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      const result = await inviteUserToHousehold(
+        household.id,
+        inviteEmail,
+        user.id
+      );
+      
+      if (result) {
+        alert(`Invitation sent to ${inviteEmail}`);
+        setInviteEmail('');
+        setIsInviting(false);
+      } else {
+        setError('Failed to send invitation. Please try again.');
+      }
+    } catch (err) {
+      console.error(err);
+      setError('An error occurred while sending the invitation.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // Prepare data for the pie chart

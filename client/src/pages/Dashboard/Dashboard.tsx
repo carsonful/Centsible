@@ -5,6 +5,7 @@ import { syncUserToFirestore } from '../../firebase/firebase';
 import { usertype } from '../../types/types';
 import Personal from './Personal/Personal';
 import Household from './Household/HouseHold';
+import PendingInvitations from '../../components/PendingInvitations';
 
 const Dashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState('personal');
@@ -50,6 +51,7 @@ const Dashboard: React.FC = () => {
           <UserButton />
         </div>
       </header>
+      <PendingInvitations />
 
       <div className="dashboard-content">
         {activeTab === 'personal' ? (
