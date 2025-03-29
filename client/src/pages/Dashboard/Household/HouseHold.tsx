@@ -627,7 +627,23 @@ const Household: React.FC = () => {
       {showAllTransactions && (
         <ViewAllTransactions 
           transactions={transactions}
+          householdId={household.id}
           onClose={() => setShowAllTransactions(false)}
+          onTransactionDeleted={() => {
+            // Refresh transactions after deletion
+            const fetchTransactions = async () => {
+              try {
+                if (household?.id) {
+                  const householdTransactions = await getHouseholdTransactions(household.id);
+                  setTransactions(householdTransactions);
+                }
+              } catch (error) {
+                console.error("Error fetching transactions:", error);
+              }
+            };
+            
+            fetchTransactions();
+          }}
         />
       )}
     </div>
