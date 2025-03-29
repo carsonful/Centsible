@@ -148,12 +148,12 @@ const Household: React.FC = () => {
         user.id
       );
       
-      if (result) {
-        alert(`Invitation sent to ${inviteEmail}`);
+      if (result.success) {
+        alert(result.message);
         setInviteEmail('');
         setIsInviting(false);
       } else {
-        setError('Failed to send invitation. Please try again.');
+        setError(result.message);
       }
     } catch (err) {
       console.error(err);
@@ -162,7 +162,6 @@ const Household: React.FC = () => {
       setIsLoading(false);
     }
   };
-
   // Prepare data for the pie chart
   const prepareCategoryData = () => {
     // Group transactions by category and sum amounts
@@ -332,20 +331,31 @@ const Household: React.FC = () => {
                           required
                         />
                       </div>
+                      
+                      {/* Display error message if there is one */}
+                      {error && (
+                        <div className="error-message">
+                          {error}
+                        </div>
+                      )}
+                      
                       <div className="form-actions">
                         <button 
                           type="button" 
                           className="button button-secondary"
-                          onClick={() => setIsInviting(false)}
+                          onClick={() => {
+                            setIsInviting(false);
+                            setError(null); // Clear error when canceling
+                          }}
                         >
                           Cancel
                         </button>
                         <button 
                           type="submit" 
                           className="button"
-                          disabled={!inviteEmail.trim()}
+                          disabled={!inviteEmail.trim() || isLoading}
                         >
-                          Send Invitation
+                          {isLoading ? 'Sending...' : 'Send Invitation'}
                         </button>
                       </div>
                     </form>
