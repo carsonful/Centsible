@@ -314,3 +314,72 @@
   color: #757575;
   font-size: 16px;
 }
+.error-message {
+  color: #d32f2f;
+  background-color: #ffebee;
+  padding: 12px;
+  border-radius: 4px;
+  margin: 10px 0;
+  font-size: 14px;
+  border-left: 4px solid #d32f2f;
+}
+
+.contribution-percent {
+  font-size: 12px;
+  color: #757575;
+  margin-left: 4px;
+}
+
+.view-all-link {
+  text-align: center;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.view-all-link .button {
+  font-size: 14px;
+}
+
+/* Add to your Household.css file */
+.transactions-list.compact .transaction-item {
+  padding: 12px 0;
+}
+
+.transactions-list.compact .transaction-name {
+  font-size: 14px;
+}
+
+.transactions-list.compact .transaction-meta {
+  gap: 8px;
+  font-size: 12px;
+}
+
+.transactions-list.compact .transaction-date {
+  font-size: 11px;
+}
+
+.transactions-list.compact .transaction-amount {
+  font-size: 14px;
+}
+
+.view-all-link {
+  text-align: center;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.view-all-link .button {
+  font-size: 14px;
+}
+
+.error-message {
+  color: #d32f2f;
+  background-color: #ffebee;
+  padding: 12px;
+  border-radius: 4px;
+  margin: 10px 0;
+  font-size: 14px;
+  border-left: 4px solid #d32f2f;
+}
