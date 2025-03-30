@@ -3,9 +3,16 @@ import React, { useState, useMemo } from 'react';
 import { transactionType } from '../types/types';
 import './ViewAllTransactions.css';
 import { formatDate, formatCurrency } from '../utils/utils';
+import { deleteHouseholdTransaction } from '../firebase/firebase';
+import { useUser } from '@clerk/clerk-react';
 
-// Create a separate TransactionRow component for better reusability
-const TransactionRow: React.FC<{ transaction: transactionType }> = ({ transaction }) => (
+// Modified TransactionRow with delete button
+const TransactionRow: React.FC<{ 
+  transaction: transactionType;
+  householdId: string;
+  onDelete: (transactionId: string) => void;
+  isDeleting: boolean;
+}> = ({ transaction, householdId, onDelete, isDeleting }) => (
   <tr>
     <td className="date-cell">
       {formatDate(transaction.date)}
@@ -18,24 +25,42 @@ const TransactionRow: React.FC<{ transaction: transactionType }> = ({ transactio
     <td className="amount-cell">
       {formatCurrency(transaction.amount)}
     </td>
+    <td className="actions-cell">
+      <button 
+        className="delete-button"
+        onClick={() => onDelete(transaction.id || '')}
+        disabled={isDeleting}
+        title="Delete transaction"
+      >
+        {isDeleting ? '...' : '×'}
+      </button>
+    </td>
   </tr>
 );
 
 interface ViewAllTransactionsProps {
   transactions: transactionType[];
+  householdId: string;
   onClose: () => void;
+  onTransactionDeleted?: () => void;
 }
 
 const ViewAllTransactions: React.FC<ViewAllTransactionsProps> = ({ 
   transactions, 
-  onClose 
+  householdId,
+  onClose,
+  onTransactionDeleted
 }) => {
+  const { user } = useUser();
   // State for sorting and filtering
   const [sortConfig, setSortConfig] = useState({
     key: 'date' as 'date' | 'amount',
     direction: 'desc' as 'asc' | 'desc'
   });
   const [filterCategory, setFilterCategory] = useState<string>('');
+  const [deletingTransactionId, setDeletingTransactionId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   
   // Get unique categories from transactions - moved to useMemo for performance
   const categories = useMemo(() => 
@@ -85,6 +110,39 @@ const ViewAllTransactions: React.FC<ViewAllTransactionsProps> = ({
     }));
   };
 
+  // Handle transaction deletion
+  const handleDeleteTransaction = async (transactionId: string) => {
+    if (!user?.id || !transactionId) return;
+    
+    setDeletingTransactionId(transactionId);
+    setError(null);
+    setSuccessMessage(null);
+    
+    try {
+      const result = await deleteHouseholdTransaction(
+        householdId,
+        transactionId,
+        user.id
+      );
+      
+      if (result.success) {
+        setSuccessMessage(result.message);
+        
+        // Call the callback to refresh transactions
+        if (onTransactionDeleted) {
+          onTransactionDeleted();
+        }
+      } else {
+        setError(result.message);
+      }
+    } catch (error) {
+      console.error("Error deleting transaction:", error);
+      setError("An unexpected error occurred while deleting the transaction.");
+    } finally {
+      setDeletingTransactionId(null);
+    }
+  };
+
   return (
     <div className="transactions-overlay" onClick={handleOverlayClick}>
       <div className="transactions-modal">
@@ -126,6 +184,20 @@ const ViewAllTransactions: React.FC<ViewAllTransactionsProps> = ({
           </div>
         </div>
         
+        {error && (
+          <div className="transactions-error">
+            <p>{error}</p>
+            <button onClick={() => setError(null)}>Dismiss</button>
+          </div>
+        )}
+        
+        {successMessage && (
+          <div className="transactions-success">
+            <p>{successMessage}</p>
+            <button onClick={() => setSuccessMessage(null)}>Dismiss</button>
+          </div>
+        )}
+        
         <div className="transactions-container">
           {sortedAndFilteredTransactions.length === 0 ? (
             <p className="no-transactions">No transactions match your filter criteria.</p>
@@ -138,13 +210,17 @@ const ViewAllTransactions: React.FC<ViewAllTransactionsProps> = ({
                   <th>Category</th>
                   <th>Paid By</th>
                   <th>Amount</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {sortedAndFilteredTransactions.map(transaction => (
                   <TransactionRow 
                     key={transaction.id} 
-                    transaction={transaction} 
+                    transaction={transaction}
+                    householdId={householdId}
+                    onDelete={handleDeleteTransaction}
+                    isDeleting={deletingTransactionId === transaction.id}
                   />
                 ))}
               </tbody>
