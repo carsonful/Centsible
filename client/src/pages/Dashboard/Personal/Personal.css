@@ -1,3 +1,45 @@
+/* src/pages/Dashboard/Personal/Personal.css */
 .personal-container {
-    width: 100%;
+  width: 100%;
+}
+
+.personal-content-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+
+@media (min-width: 992px) {
+  .personal-content-grid {
+    grid-template-columns: 3fr 2fr;
   }
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  color: #757575;
+}
+
+.error-message {
+  color: #d32f2f;
+  background-color: #ffebee;
+  padding: 12px;
+  border-radius: 4px;
+  margin: 10px 0;
+  font-size: 14px;
+  border-left: 4px solid #d32f2f;
+}
+
+.empty-chart-message {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  color: #757575;
+  text-align: center;
+  background-color: #f9f9f9;
+  border-radius: 4px;
+}

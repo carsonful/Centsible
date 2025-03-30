@@ -3,6 +3,7 @@ import './HouseHold.css';
 import { createHouseHold, getUserHousehold, getHouseholdTransactions, inviteUserToHousehold } from '../../../firebase/firebase';
 import { usertype, householdType, transactionType } from '../../../types/types';
 import { useUser } from '@clerk/clerk-react';
+import ExpenseTrendChart from '../../../components/ExpenseTrendChart'; // Import the ExpenseTrendChart component
 import AddHouseholdTransaction from '../../../components/AddHouseholdTransaction';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 import { collection, getDocs, getFirestore, query, where } from 'firebase/firestore';
@@ -585,7 +586,14 @@ const Household: React.FC = () => {
                   )}
                 </div>
               </div>
-              
+              <div className="card">
+              <div className="card-header">
+                <h2>Expense Trends Over Time</h2>
+              </div>
+                <div className="card-content">
+                  <ExpenseTrendChart transactions={transactions} months={6} />
+                </div>
+              </div>
               {/* User Contribution Chart */}
               <div className="card">
                 <div className="card-header">

@@ -1,0 +1,93 @@
+/* ExpenseTrendChart.css */
+.expense-trend-chart {
+    background: white;
+    border-radius: 8px;
+    padding: 16px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    margin-bottom: 20px;
+  }
+  
+  .expense-chart-placeholder {
+    height: 350px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #757575;
+    font-size: 16px;
+    border: 1px dashed #e0e0e0;
+  }
+  
+  /* Custom tooltip styling */
+  .expense-chart-tooltip {
+    background-color: rgba(255, 255, 255, 0.95);
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    min-width: 180px;
+  }
+  
+  .tooltip-label {
+    font-weight: 600;
+    color: #424242;
+    margin: 0 0 8px 0;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 14px;
+  }
+  
+  .tooltip-content {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  
+  .tooltip-item {
+    display: flex;
+    align-items: center;
+    font-size: 13px;
+  }
+  
+  .color-indicator {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 8px;
+  }
+  
+  .tooltip-item .name {
+    flex: 1;
+    color: #616161;
+  }
+  
+  .tooltip-item .value {
+    font-weight: 600;
+    color: #2E7D32;
+  }
+  
+  /* Chart legend styling */
+  .recharts-default-legend {
+    padding: 10px 0 !important;
+  }
+  
+  .recharts-legend-item {
+    margin-right: 18px !important;
+  }
+  
+  .recharts-legend-item-text {
+    color: #616161 !important;
+    font-size: 13px !important;
+  }
+  
+  /* Animation for dots */
+  @keyframes pulse {
+    0% { r: 3; }
+    50% { r: 5; }
+    100% { r: 3; }
+  }
+  
+  .recharts-dot {
+    animation: pulse 2s infinite;
+  }
