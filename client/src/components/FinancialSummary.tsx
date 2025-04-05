@@ -38,10 +38,7 @@ const FinancialSummary: React.FC<FinancialSummaryProps> = ({ transactions }) => 
   });
   
   // Calculate recent income
-  const recentIncome = recentTransactions
-    .filter(t => parseFloat(t.amount?.toString() || "0") > 0 || t.category === 'Income')
-    .reduce((sum, t) => sum + Math.abs(parseFloat(t.amount?.toString() || "0")), 0);
-  
+
   // Calculate recent expenses
   const recentExpenses = recentTransactions
     .filter(t => parseFloat(t.amount?.toString() || "0") < 0 && t.category !== 'Income')
